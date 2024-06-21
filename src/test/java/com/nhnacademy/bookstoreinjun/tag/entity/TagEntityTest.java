@@ -10,8 +10,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.TestPropertySource;
 
 @DataJpaTest
+@TestPropertySource(locations = "classpath:application-dev.properties")
 public class TagEntityTest {
 
     @PersistenceContext

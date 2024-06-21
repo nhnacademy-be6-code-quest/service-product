@@ -15,8 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.test.context.TestPropertySource;
 
 @DataJpaTest
+@TestPropertySource(locations = "classpath:application-dev.properties")
 public class BookEntityTest {
 
     @PersistenceContext
