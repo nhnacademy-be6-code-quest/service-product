@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -72,6 +73,7 @@ class ProductControllerTest {
         String requestBody = objectMapper.writeValueAsString(requestDto);
 
         mockMvc.perform(put("/api/product/admin/update/state")
+                        .with(csrf())
                         .header("X-User-Id", "1")
                         .header("X-User-Role", "ROLE_ADMIN")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -92,6 +94,7 @@ class ProductControllerTest {
         String requestBody = objectMapper.writeValueAsString(requestDto);
 
         mockMvc.perform(post("/api/product/client/like")
+                        .with(csrf())
                         .header("X-User-Id", "1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
@@ -107,6 +110,7 @@ class ProductControllerTest {
     void test4() throws Exception {
 
         mockMvc.perform(delete("/api/product/client/unlike")
+                        .with(csrf())
                         .header("X-User-Id", "1")
                         .param("productId", "1")
                 )
@@ -129,6 +133,7 @@ class ProductControllerTest {
         when(productService.setProductInventory(requestDto)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
         mockMvc.perform(put("/api/product/admin/inventory/set")
+                        .with(csrf())
                         .header("X-User-Id", "1")
                         .header("X-User-Role", "ROLE_ADMIN")
                         .contentType(MediaType.APPLICATION_JSON)

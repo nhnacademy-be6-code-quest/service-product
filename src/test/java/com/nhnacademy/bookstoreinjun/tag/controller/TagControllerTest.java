@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,6 +50,7 @@ class TagControllerTest {
         String json = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(post("/api/product/admin/tag/register")
+                        .with(csrf())
                         .header("X-User-Id", "1")
                         .header("X-User-Role", "ROLE_ADMIN")
                 .content(json)
@@ -70,6 +72,7 @@ class TagControllerTest {
         when(tagService.saveTag(dto)).thenThrow(DuplicateException.class);
 
         mockMvc.perform(post("/api/product/admin/tag/register")
+                        .with(csrf())
                         .header("X-User-Id", "1")
                         .header("X-User-Role", "ROLE_ADMIN")
                         .content(json)
@@ -91,6 +94,7 @@ class TagControllerTest {
         String json = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(put("/api/product/admin/tag/update")
+                        .with(csrf())
                         .header("X-User-Id", "1")
                         .header("X-User-Role", "ROLE_ADMIN")
                         .content(json)
@@ -104,6 +108,7 @@ class TagControllerTest {
     @Test
     void testDeleteTagSuccess() throws Exception {
         mockMvc.perform(delete("/api/product/admin/tag/delete/1")
+                        .with(csrf())
                         .header("X-User-Id", "1")
                         .header("X-User-Role", "ROLE_ADMIN"))
                 .andExpect(status().isOk());

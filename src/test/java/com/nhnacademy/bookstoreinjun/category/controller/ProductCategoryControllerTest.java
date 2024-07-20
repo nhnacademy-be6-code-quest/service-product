@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,6 +53,7 @@ class ProductCategoryControllerTest {
         String json = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(post("/api/product/admin/category/register")
+                        .with(csrf())
                         .header("X-User-Role", "ROLE_ADMIN")
                         .header("X-User-Id", 1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -73,6 +75,7 @@ class ProductCategoryControllerTest {
         when(productCategoryService.saveCategory(dto)).thenThrow(DuplicateException.class);
 
         mockMvc.perform(post("/api/product/admin/category/register")
+                        .with(csrf())
                         .header("X-User-Role", "ROLE_ADMIN")
                         .header("X-User-Id", 1)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,6 +98,7 @@ class ProductCategoryControllerTest {
 
 
         mockMvc.perform(post("/api/product/admin/category/register")
+                        .with(csrf())
                         .header("X-User-Role", "ROLE_ADMIN")
                         .header("X-User-Id", 1)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,6 +119,7 @@ class ProductCategoryControllerTest {
         String json = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(put("/api/product/admin/category/update")
+                        .with(csrf())
                         .header("X-User-Role", "ROLE_ADMIN")
                         .header("X-User-Id", 1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -129,6 +134,7 @@ class ProductCategoryControllerTest {
     void deleteCategoryTestSuccess() throws Exception {
 
         mockMvc.perform(delete("/api/product/admin/category/delete/1")
+                        .with(csrf())
                         .header("X-User-Role", "ROLE_ADMIN")
                         .header("X-User-Id", 1)
                 )

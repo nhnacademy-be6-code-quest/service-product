@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -70,6 +71,7 @@ class PackagingControllerTest {
                 .build();
         String requestJson = objectMapper.writeValueAsString(requestDto);
         mockMvc.perform(post("/api/product/admin/packaging/register")
+                        .with(csrf())
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-User-Role", "ROLE_ADMIN")
@@ -96,6 +98,7 @@ class PackagingControllerTest {
                 .build();
         String requestJson = objectMapper.writeValueAsString(requestDto);
         mockMvc.perform(put("/api/product/admin/packaging/update")
+                        .with(csrf())
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-User-Role", "ROLE_ADMIN")

@@ -23,6 +23,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -87,8 +88,9 @@ class CartControllerTest {
                                 .build()));
 
         mockMvc.perform(post("/api/product/guest/cart")
-                                .content(objectMapper.writeValueAsString(requestDtoList))
-                                .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(requestDtoList))
+                        .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
@@ -105,6 +107,7 @@ class CartControllerTest {
                 .quantity(3L)
                 .build();
         mockMvc.perform(post("/api/product/client/cart/add")
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-User-Id", 1)
@@ -121,6 +124,7 @@ class CartControllerTest {
                 .quantity(3L)
                 .build();
         mockMvc.perform(post("/api/product/guest/cart/add")
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -136,6 +140,7 @@ class CartControllerTest {
                 .quantity(3L)
                 .build();
         mockMvc.perform(put("/api/product/client/cart/update")
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("X-User-Id", 1)
@@ -152,6 +157,7 @@ class CartControllerTest {
                 .quantity(3L)
                 .build();
         mockMvc.perform(put("/api/product/guest/cart/update")
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -163,6 +169,7 @@ class CartControllerTest {
     @Test
     void deleteClientCartItemTest() throws Exception {
         mockMvc.perform(delete("/api/product/client/cart/items/1")
+                        .with(csrf())
                         .header("X-User-Id", 1)
                 )
                 .andExpect(status().isOk());
@@ -173,7 +180,8 @@ class CartControllerTest {
     @Test
     void clearClientCartItemTest() throws Exception {
         mockMvc.perform(delete("/api/product/client/cart/all")
-                                .header("X-User-Id", 1)
+                        .with(csrf())
+                        .header("X-User-Id", 1)
                 )
                 .andExpect(status().isOk());
         verify(cartService,times(1)).clearAllCart(1L);
