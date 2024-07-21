@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 
 public interface BookService {
 
-    Boolean checkIfBookExists(String isbn);
+    boolean checkIfBookExists(String isbn);
 
     /**
      * 도서 등록 요청에 따른, 상품 등록 결과를 반환합니다.

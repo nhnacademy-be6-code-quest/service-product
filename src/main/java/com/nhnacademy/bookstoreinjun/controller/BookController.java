@@ -76,9 +76,9 @@ public class BookController {
     }
 
     @GetMapping("/book/isbnCheck")
-    public ResponseEntity<Boolean> checkIfBookExists(@RequestParam("isbn") String isbn){
-        log.info("Checking if book exists with isbn {}", isbn);
-        return new ResponseEntity<>(bookService.checkIfBookExists(isbn), header, HttpStatus.OK);
+    public ResponseEntity<Void> checkIfBookExists(@RequestParam("isbn") String isbn){
+        boolean duplicate = bookService.checkIfBookExists(isbn);
+        return new ResponseEntity<>(null, header, duplicate ? HttpStatus.CONFLICT : HttpStatus.OK);
     }
 
     @GetMapping("/books")
