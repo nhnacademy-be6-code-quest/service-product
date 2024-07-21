@@ -18,10 +18,10 @@
 ### Architecture
 
 수정해야함 (인증 그대로 복붙한거임)
-![Auth Architecture](https://github.com/nhnacademy-be6-code-quest/.github/blob/main/img/auth/AuthArchitecture.png)
+![Auth Architecture](https://github.com/nhnacademy-be6-code-quest/.github/blob/main/img/product/ProductServiceArchitecture.png)
 
 ### Test
 
 수정해야함 (인증 그대로 복붙한거임)
-![Auth Test](https://github.com/nhnacademy-be6-code-quest/.github/blob/main/img/auth/AuthTest.png)
+![Auth Test](https://github.com/nhnacademy-be6-code-quest/.github/blob/main/img/product/ProductServiceTest.png)
 
