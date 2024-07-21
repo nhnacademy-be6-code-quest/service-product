@@ -26,6 +26,7 @@ public class SecurityConfig {
     private static final String  ADMIN = "ROLE_ADMIN";
 
     @Bean
+    @SuppressWarnings("java:S4502") // Be sure to disable csrf
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)

@@ -399,9 +399,9 @@ class BookServiceTest {
         PageRequestDto dto = PageRequestDto.builder()
                 .page(10)
                 .build();
-
-        when(querydslRepository.findBooksByTagFilter(eq(1L),eq(Set.copyOf(Arrays.asList("tag1", "tag2"))), eq(true), any(), eq(0))).thenReturn(new PageImpl<>(new ArrayList<>()));
-        assertThrows(PageOutOfRangeException.class, () -> bookService.getBookPageFilterByTagsAndProductState(1L, dto, Set.copyOf(Arrays.asList("tag1", "tag2")), true, 0));
+        Set<String> tags = Set.copyOf(Arrays.asList("tag1", "tag2"));
+        when(querydslRepository.findBooksByTagFilter(eq(1L),eq(tags), eq(true), any(), eq(0))).thenReturn(new PageImpl<>(new ArrayList<>()));
+        assertThrows(PageOutOfRangeException.class, () -> bookService.getBookPageFilterByTagsAndProductState(1L, dto, tags, true, 0));
     }
 
 
@@ -412,8 +412,9 @@ class BookServiceTest {
                 .sort("wrong sort")
                 .build();
 
-        when(querydslRepository.findBooksByTagFilter(eq(1L),eq(Set.copyOf(Arrays.asList("tag1", "tag2"))), eq(true), any(), eq(0))).thenThrow(InvalidDataAccessApiUsageException.class);
-        assertThrows(InvalidSortNameException.class, () -> bookService.getBookPageFilterByTagsAndProductState(1L, dto, Set.copyOf(Arrays.asList("tag1", "tag2")), true, 0));
+        Set<String> tags = Set.copyOf(Arrays.asList("tag1", "tag2"));
+        when(querydslRepository.findBooksByTagFilter(eq(1L),eq(tags), eq(true), any(), eq(0))).thenThrow(InvalidDataAccessApiUsageException.class);
+        assertThrows(InvalidSortNameException.class, () -> bookService.getBookPageFilterByTagsAndProductState(1L, dto, tags, true, 0));
     }
 
 
