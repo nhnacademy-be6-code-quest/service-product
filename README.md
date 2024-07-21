@@ -1,6 +1,6 @@
 # [Book Store](https://book-store.shop)
 
-## 🔒 Product Service
+## 🛍️ Product Service
 
  상품과 관련한 전반전인 기능을 수행합니다.  
  
