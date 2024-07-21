@@ -31,7 +31,7 @@ public class LogAndCrashAppender extends AppenderBase<ILoggingEvent> {
     }
 
     @Override
-    protected void append(ILoggingEvent eventObject) {
+    public void append(ILoggingEvent eventObject) {
         String logMessage = eventObject.getFormattedMessage();
         if (eventObject.getThrowableProxy() != null) {
             logMessage += "\n" + eventObject.getThrowableProxy().getClassName() + ": "
