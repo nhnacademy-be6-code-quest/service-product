@@ -3,6 +3,7 @@ package com.nhnacademy.bookstoreinjun.controller;
 
 import com.nhnacademy.bookstoreinjun.dto.page.PageRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventorySetRequestDto;
+import com.nhnacademy.bookstoreinjun.dto.product.ProductGetNameAndPriceResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductGetResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductLikeRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductLikeResponseDto;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +40,12 @@ public class ProductController {
 
     private static final String ID_HEADER = "X-User-Id";
 
+    @GetMapping("/single/{productId}")
+    public ResponseEntity<ProductGetNameAndPriceResponseDto> getSingleProductNameAndPriceSales(
+            @PathVariable("productId") Long productId
+    ) {
+        return new ResponseEntity<>(productService.getSingleProductInfo(productId), header, HttpStatus.OK);
+    }
 
     @GetMapping("/admin/page/all")
     public ResponseEntity<Page<ProductGetResponseDto>> getAllProducts(

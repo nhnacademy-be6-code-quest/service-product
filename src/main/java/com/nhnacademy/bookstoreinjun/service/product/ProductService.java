@@ -2,6 +2,7 @@ package com.nhnacademy.bookstoreinjun.service.product;
 
 import com.nhnacademy.bookstoreinjun.dto.page.PageRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventorySetRequestDto;
+import com.nhnacademy.bookstoreinjun.dto.product.ProductGetNameAndPriceResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductGetResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductLikeRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductLikeResponseDto;
@@ -25,6 +26,7 @@ public interface ProductService {
      */
     Page<ProductGetResponseDto> findAllPage(PageRequestDto pageRequestDto);
 
+    ProductGetNameAndPriceResponseDto getSingleProductInfo(Long productId);
 
     /**
      * 상품의 좋아요를 남깁니다.

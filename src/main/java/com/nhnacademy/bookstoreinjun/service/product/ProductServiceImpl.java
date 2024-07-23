@@ -7,6 +7,7 @@ import com.nhnacademy.bookstoreinjun.dto.page.PageRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryDecreaseRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryIncreaseRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventorySetRequestDto;
+import com.nhnacademy.bookstoreinjun.dto.product.ProductGetNameAndPriceResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductGetResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductLikeRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductLikeResponseDto;
@@ -92,6 +93,16 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    public ProductGetNameAndPriceResponseDto getSingleProductInfo(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundIdException(TYPE, productId));
+        return ProductGetNameAndPriceResponseDto.builder()
+                .productId(product.getProductId())
+                .productName(product.getProductName())
+                .productPriceSales(product.getProductPriceSales())
+                .build();
+    }
+
 
     @Override
     public ProductLikeResponseDto saveProductLike(Long clientIdOfHeader, ProductLikeRequestDto productLikeRequestDto){
@@ -164,6 +175,10 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @RabbitListener(queues = "${rabbit.inventory.decrease.dlq.queue.name}")
+    void saveDecreaseDlqLog(String message){
+        log.error("Decreasing inventory finally failed processing rabbitMq message - {}", message);
+    }
 
     @RabbitListener(queues = "${rabbit.inventory.increase.queue.name}")
     @Override
@@ -181,6 +196,11 @@ public class ProductServiceImpl implements ProductService {
         } catch (JsonProcessingException  | JpaSystemException e) {
             log.error("Increasing product inventory failed, error message : {}", e.getMessage());
         }
+    }
+
+    @RabbitListener(queues = "${rabbit.inventory.increase.dlq.queue.name}")
+    public void saveIncreaseDlqLog(String message){
+        log.error("Increasing inventory finally failed processing rabbitMq message - {}", message);
     }
 
     @Override

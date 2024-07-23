@@ -12,6 +12,7 @@ import com.nhnacademy.bookstoreinjun.dto.page.PageRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryDecreaseRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryIncreaseRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventorySetRequestDto;
+import com.nhnacademy.bookstoreinjun.dto.product.ProductGetNameAndPriceResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductGetResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductLikeRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductLikeResponseDto;
@@ -48,6 +49,7 @@ import org.springframework.http.ResponseEntity;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -379,5 +381,37 @@ class ProductServiceTest {
 
         assertNotNull(responseEntity);
         assertEquals(404, responseEntity.getStatusCode().value());
+    }
+
+    @DisplayName("상품명 및 판매가 조회 성공 테스트")
+    @Test
+    void getProductNameAndPriceSalesSuccessTest(){
+        Product product = Product.builder()
+                .productId(1L)
+                .productName("test product")
+                .productPriceSales(12345)
+                .build();
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        ProductGetNameAndPriceResponseDto responseDto = productService.getSingleProductInfo(1L);
+
+        assertNotNull(responseDto);
+        assertEquals(1L, responseDto.productId());
+        assertEquals("test product", responseDto.productName());
+        assertEquals(12345, responseDto.productPriceSales());
+
+        verify(productRepository, times(1)).findById(1L);
+    }
+
+    @DisplayName("상품명 및 판매가 조회 실패 테스트 - 존재하지 않는 상품에 대한 요청")
+    @Test
+    void getProductNameAndPriceSalesFailureTest(){
+        
+        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundIdException.class, () -> productService.getSingleProductInfo(1L));
+
+        verify(productRepository, times(1)).findById(1L);
     }
 }

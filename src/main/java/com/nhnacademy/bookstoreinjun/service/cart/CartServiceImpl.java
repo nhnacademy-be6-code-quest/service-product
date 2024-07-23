@@ -169,7 +169,7 @@ public class CartServiceImpl implements CartService {
 
     @RabbitListener(queues = "${rabbit.cart.checkout.dlq.queue.name}")
     public void saveDlqLog(String message){
-        log.error("Finally failed processing rabbitMq message - {}", message);
+        log.error("Checkout cart finally failed processing rabbitMq message - {}", message);
     }
 
 

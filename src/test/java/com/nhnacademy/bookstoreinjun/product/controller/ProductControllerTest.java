@@ -144,4 +144,12 @@ class ProductControllerTest {
         verify(productService,times(1)).setProductInventory(requestDto);
     }
 
+    @DisplayName("상품 이름, 판매가만 조회")
+    @Test
+    void test6() throws Exception {
+        mockMvc.perform(get("/api/product/single/1"))
+                .andExpect(status().isOk());
+
+        verify(productService,times(1)).getSingleProductInfo(1L);
+    }
 }

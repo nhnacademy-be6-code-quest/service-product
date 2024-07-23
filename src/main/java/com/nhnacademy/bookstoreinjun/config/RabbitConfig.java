@@ -50,7 +50,6 @@ public class RabbitConfig {
     @Value("${rabbit.cart.checkout.dlq.routing.key}")
     private String cartCheckoutDlqRoutingKey;
 
-
     @Bean
     DirectExchange increaseInventoryExchange() {
         return new DirectExchange(increaseInventoryExchangeName);
