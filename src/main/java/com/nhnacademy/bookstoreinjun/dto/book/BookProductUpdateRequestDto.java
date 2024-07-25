@@ -17,6 +17,12 @@ public record BookProductUpdateRequestDto (
         String productName,
         boolean packable,
 
+        @Length(min = 10, max =10) String isbn,
+
+        @Length(min = 13, max =13) String isbn13,
+
+        String cover,
+
         @NotNull
         @NotBlank
         String productDescription,

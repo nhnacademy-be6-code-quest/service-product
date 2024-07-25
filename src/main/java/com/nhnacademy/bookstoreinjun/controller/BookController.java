@@ -13,6 +13,7 @@ import com.nhnacademy.bookstoreinjun.service.aladin.AladinService;
 import com.nhnacademy.bookstoreinjun.service.book.BookService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +65,7 @@ public class BookController {
     @PutMapping("/admin/book/update")
     public ResponseEntity<ProductUpdateResponseDto> updateBook(
             @Valid @RequestBody BookProductUpdateRequestDto bookProductUpdateRequestDto){
+        log.info("dto : {}", bookProductUpdateRequestDto);
         return new ResponseEntity<>(bookService.updateBook(bookProductUpdateRequestDto), header, HttpStatus.OK);
     }
 
@@ -110,7 +112,7 @@ public class BookController {
 
 
     @GetMapping("/books/category/{categoryId}")
-    public ResponseEntity<Page<BookProductGetResponseDto>> getBookPageFilterByCategory(
+    public ResponseEntity<Map<String, Page<BookProductGetResponseDto>>> getBookPageFilterByCategory(
             @RequestHeader HttpHeaders httpHeaders,
             @Valid @ModelAttribute PageRequestDto pageRequestDto,
             @RequestParam(name = "productState", required = false) Integer productState,

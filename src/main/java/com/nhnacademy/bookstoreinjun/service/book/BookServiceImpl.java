@@ -1,5 +1,7 @@
 package com.nhnacademy.bookstoreinjun.service.book;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookstoreinjun.dto.book.BookProductGetResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.book.BookProductRegisterRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.book.BookProductUpdateRequestDto;
@@ -27,6 +29,7 @@ import com.nhnacademy.bookstoreinjun.util.PageableUtil;
 import com.nhnacademy.bookstoreinjun.util.ProductCheckUtil;
 import com.nhnacademy.bookstoreinjun.util.SortCheckUtil;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +61,11 @@ public class BookServiceImpl implements BookService {
 
     private final ProductCheckUtil productCheckUtil;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private static final String TYPE = "book";
+
+    private static final String CATEGORY = "category";
 
     private static final int DEFAULT_PAGE_SIZE = 10;
     private static final String DEFAULT_SORT = "product.productRegisterDate";
@@ -68,7 +75,7 @@ public class BookServiceImpl implements BookService {
         for (String categoryName : categories) {
             ProductCategory productCategory = productCategoryRepository.findByCategoryName(categoryName);
             if (productCategory == null){
-                throw new NotFoundNameException("category", categoryName);
+                throw new NotFoundNameException(CATEGORY, categoryName);
             }
 
             ProductCategoryRelation productCategoryRelation = ProductCategoryRelation.builder()
@@ -166,17 +173,23 @@ public class BookServiceImpl implements BookService {
 
 
     @Override
-    public Page<BookProductGetResponseDto> getBookPageFilterByCategoryAndProductState(Long clientIdOfHeader, PageRequestDto pageRequestDto, Long categoryId, Integer productState) {
+    public Map<String, Page<BookProductGetResponseDto>> getBookPageFilterByCategoryAndProductState
+            (Long clientIdOfHeader, PageRequestDto pageRequestDto, Long categoryId, Integer productState) {
         Pageable pageable = PageableUtil.makePageable(pageRequestDto, DEFAULT_PAGE_SIZE, DEFAULT_SORT);
 
         try {
+            ProductCategory productCategory = productCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundIdException(CATEGORY, categoryId));
+            String categoryJson = objectMapper.writeValueAsString(productCategory);
             Page<BookProductGetResponseDto> result = querydslRepository.findBooksByCategoryFilter(clientIdOfHeader, categoryId, pageable, productState);
 
             PageableUtil.pageNumCheck(result, pageable);
 
-            return result;
+            return Map.of(categoryJson, result);
         }catch (InvalidDataAccessApiUsageException e){
             throw SortCheckUtil.throwInvalidSortNameException(pageable);
+        }catch (JsonProcessingException e) {
+            log.warn("JSON parsing failed; the category might be causing a circular reference issue: categoryId={}", categoryId, e);
+            throw new NotFoundIdException(CATEGORY, categoryId);
         }
     }
 
@@ -266,5 +279,4 @@ public class BookServiceImpl implements BookService {
 
         return new ProductUpdateResponseDto(LocalDateTime.now());
     }
-
 }

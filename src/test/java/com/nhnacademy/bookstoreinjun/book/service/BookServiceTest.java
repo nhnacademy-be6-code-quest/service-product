@@ -40,6 +40,8 @@ import com.nhnacademy.bookstoreinjun.util.ProductCheckUtil;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -426,12 +428,15 @@ class BookServiceTest {
 
         PageRequestDto dto = PageRequestDto.builder().build();
 
+        when(productCategoryRepository.findById(1L)).thenReturn(Optional.of(new ProductCategory()));
         when(querydslRepository.findBooksByCategoryFilter(eq(1L),eq(1L), any(), eq(0))).thenReturn(new PageImpl<>(Arrays.asList(testBook1, testBook2)));
-        Page<BookProductGetResponseDto> bookPage = bookService.getBookPageFilterByCategoryAndProductState(1L, dto, 1L,  0);
+        Map<String, Page<BookProductGetResponseDto>>
+                bookPageMap = bookService.getBookPageFilterByCategoryAndProductState(1L, dto, 1L,  0);
 
-        assertNotNull(bookPage);
+        assertNotNull(bookPageMap);
         verify(querydslRepository,times(1)).findBooksByCategoryFilter(eq(1L),eq(1L), any(), eq(0));
-        assertEquals(2, bookPage.getTotalElements());
+
+        assertEquals(2, bookPageMap.values().stream().findFirst().orElseThrow().getTotalElements());
     }
 
     @DisplayName("도서 조회 실패 테스트 - 카테고리로 필터링 된 도서 페이지 : 너무 큰 수의 페이지")
@@ -440,7 +445,7 @@ class BookServiceTest {
         PageRequestDto dto = PageRequestDto.builder()
                 .page(10)
                 .build();
-
+        when(productCategoryRepository.findById(1L)).thenReturn(Optional.of(new ProductCategory()));
         when(querydslRepository.findBooksByCategoryFilter(eq(1L),eq(1L), any(), eq(0))).thenReturn(new PageImpl<>(new ArrayList<>()));
         assertThrows(PageOutOfRangeException.class, () -> bookService.getBookPageFilterByCategoryAndProductState(1L, dto, 1L,  0));
     }
@@ -453,6 +458,7 @@ class BookServiceTest {
                 .sort("wrong sort")
                 .build();
 
+        when(productCategoryRepository.findById(1L)).thenReturn(Optional.of(new ProductCategory()));
         when(querydslRepository.findBooksByCategoryFilter(eq(1L),eq(1L), any(), eq(0))).thenThrow(InvalidDataAccessApiUsageException.class);
         assertThrows(InvalidSortNameException.class, () -> bookService.getBookPageFilterByCategoryAndProductState(1L, dto, 1L,  0));
     }
@@ -512,8 +518,7 @@ class BookServiceTest {
     @Test
     void checkIfBookExistTest(){
         when(bookRepository.existsByIsbn(any())).thenReturn(true);
-        Boolean result = bookService.checkIfBookExists("1");
-        assertNotNull(result);
+        boolean result = bookService.checkIfBookExists("1");
         assertTrue(result);
     }
 
@@ -521,8 +526,7 @@ class BookServiceTest {
     @Test
     void checkIfBookExistTest2(){
         when(bookRepository.existsByIsbn(any())).thenReturn(false);
-        Boolean result = bookService.checkIfBookExists("1");
-        assertNotNull(result);
+        boolean result = bookService.checkIfBookExists("1");
         assertFalse(result);
     }
 }

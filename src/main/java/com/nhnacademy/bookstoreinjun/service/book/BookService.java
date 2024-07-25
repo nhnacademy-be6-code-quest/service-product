@@ -7,6 +7,7 @@ import com.nhnacademy.bookstoreinjun.dto.page.PageRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductRegisterResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.product.ProductUpdateResponseDto;
 import com.nhnacademy.bookstoreinjun.exception.PageOutOfRangeException;
+import java.util.Map;
 import java.util.Set;
 import com.nhnacademy.bookstoreinjun.exception.InvalidSortNameException;
 import org.springframework.data.domain.Page;
@@ -104,7 +105,7 @@ public interface BookService {
      * @param categoryId 필터링할 카테고리 아이디
      * @return 카테고리명으로 필터링된 도서 상품 페이지
      */
-    Page<BookProductGetResponseDto> getBookPageFilterByCategoryAndProductState(Long clientIdOfHeader, PageRequestDto pageRequestDto, Long categoryId, Integer productState);
+    Map<String, Page<BookProductGetResponseDto>> getBookPageFilterByCategoryAndProductState(Long clientIdOfHeader, PageRequestDto pageRequestDto, Long categoryId, Integer productState);
 
 
     Page<BookProductGetResponseDto> getLikeBookPage(Long clientIdOfHeader, PageRequestDto pageRequestDto, Integer productState);
