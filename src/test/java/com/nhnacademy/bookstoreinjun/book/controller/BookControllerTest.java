@@ -27,7 +27,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -61,17 +60,45 @@ class BookControllerTest {
     @MockBean
     BookService bookService;
 
+    private HttpHeaders headers;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
         objectMapper.registerModule(new JavaTimeModule());
+        headers = new HttpHeaders();
+        headers.set("X-User-Id", "1");
+        headers.set("X-User-Role", "ROLE_ADMIN");
+    }
+
+    @DisplayName("권한 체크 테스트 1 (비회원)")
+    @Test
+    void roleCheckTest1() throws Exception {
+        mockMvc.perform(get("/api/product/admin/book/roleCheck"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @DisplayName("권한 체크 테스트 2 (일반회원)")
+    @Test
+    void roleCheckTest2() throws Exception {
+        mockMvc.perform(get("/api/product/admin/book/roleCheck")
+                        .header("X-User-Id", "1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @DisplayName("권한 체크 테스트 3 (관리자)")
+    @Test
+    void roleCheckTest3() throws Exception {
+        mockMvc.perform(get("/api/product/admin/book/roleCheck")
+                        .headers(headers))
+                .andExpect(status().isOk());
     }
 
     @DisplayName("도서 조회 성공 테스트 - 알라딘 api")
     @Test
     void test1() throws Exception {
-        mockMvc.perform(get("/api/product/book")
+        mockMvc.perform(get("/api/product/admin/book")
                         .header("X-User-Role", "ROLE_ADMIN")
                         .header("X-User-Id", 1)
                         .param("title","이해"))
@@ -83,11 +110,10 @@ class BookControllerTest {
 
     @DisplayName("도서 조회 실패 테스트 - 알라딘 api")
     @Test
-    @WithMockUser(roles = "ADMIN")
     void test4() throws Exception {
         when(aladinService.getAladdinBookPage(any(), eq("이해"))).thenThrow(new AladinJsonProcessingException("error"));
 
-        mockMvc.perform(get("/api/product/book")
+        mockMvc.perform(get("/api/product/admin/book")
                         .header("X-User-Role", "ROLE_ADMIN")
                         .header("X-User-Id", 1)
                         .param("title","이해"))
@@ -96,9 +122,9 @@ class BookControllerTest {
 
     @DisplayName("도서 상품 중복 확인 테스트")
     @Test
-    @WithMockUser(roles = "ADMIN")
     void isbnCheckTest() throws Exception {
-        mockMvc.perform(get("/api/product/book/isbnCheck")
+        mockMvc.perform(get("/api/product/admin/book/isbnCheck")
+                        .headers(headers)
                         .param("isbn", "1234567890"))
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -106,7 +132,6 @@ class BookControllerTest {
 
     @DisplayName("도서 상품 등록 성공 테스트")
     @Test
-    @WithMockUser(roles = "ADMIN")
     void test2() throws Exception {
 
         BookProductRegisterRequestDto bookProductRegisterRequestDto = BookProductRegisterRequestDto.builder()
@@ -146,7 +171,6 @@ class BookControllerTest {
 
     @DisplayName("도서 상품 등록 실패 테스트 - 상품명 제약 조건 위반 (최소 2 글자)")
     @Test
-    @WithMockUser(roles = "ADMIN")
     void test5() throws Exception {
         BookProductRegisterRequestDto bookProductRegisterRequestDto = BookProductRegisterRequestDto.builder()
                 .title("test title")
@@ -182,7 +206,6 @@ class BookControllerTest {
 
     @DisplayName("도서 상품 업데이트 성공")
     @Test
-    @WithMockUser(roles = "ADMIN")
     void test6() throws Exception {
         BookProductUpdateRequestDto bookProductUpdateRequestDto = BookProductUpdateRequestDto.builder()
                 .productId(1L)
@@ -213,15 +236,22 @@ class BookControllerTest {
 
     @DisplayName("도서 조회 성공 - 개별 도서")
     @Test
-    @WithMockUser(roles = "CLIENT")
     void getIndividualBookTestSuccess() throws Exception {
         mockMvc.perform(get("/api/product/book/1"))
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("도서 조회 성공 - 개별 도서 (관리자)")
+    @Test
+    void getIndividualBookTestSuccess2() throws Exception {
+        mockMvc.perform(get("/api/product/admin/book/1")
+                        .headers(headers))
+                .andExpect(status().isOk());
+    }
+
+
     @DisplayName("도서 조회 실패 - 개별 도서 (존재하지 않는 도서)")
     @Test
-    @WithMockUser(roles = "CLIENT")
     void getIndividualBookTestFailure() throws Exception {
         when(bookService.getBookByProductId(any(), eq(1L))).thenThrow(NotFoundIdException.class);
 
@@ -230,7 +260,6 @@ class BookControllerTest {
     }
 
     @DisplayName("도서 페이지 조회 성공")
-    @WithMockUser(roles = "CLIENT")
     @Test
     void getBookPageSuccess() throws Exception {
         PageRequestDto dto = PageRequestDto.builder().build();
@@ -243,8 +272,21 @@ class BookControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("도서 페이지 조회 성공 (관리자)")
+    @Test
+    void getBookPageSuccess2() throws Exception {
+        PageRequestDto dto = PageRequestDto.builder().build();
+
+        String json = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(get("/api/product/admin/books")
+                        .headers(headers)
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("도서 페이지 조회 - 제목 포함")
-    @WithMockUser(roles = "CLIENT")
     @Test
     void getBookPageByTitle() throws Exception {
         mockMvc.perform(get("/api/product/books/containing")
@@ -252,16 +294,31 @@ class BookControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("도서 페이지 조회 - 제목 포함 (관리자)")
+    @Test
+    void getBookPageByTitle2() throws Exception {
+        mockMvc.perform(get("/api/product/admin/books/containing")
+                        .headers(headers)
+                        .param("title", "test"))
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("도서 페이지 조회 - 카테고리")
-    @WithMockUser(roles = "CLIENT")
     @Test
     void getBookPageByCategory() throws Exception {
         mockMvc.perform(get("/api/product/books/category/1"))
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("도서 페이지 조회 - 카테고리 (관리자)")
+    @Test
+    void getBookPageByCategory2() throws Exception {
+        mockMvc.perform(get("/api/product/admin/books/category/1")
+                        .headers(headers))
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("도서 페이지 조회 - 태그")
-    @WithMockUser(roles = "CLIENT")
     @Test
     void getBookPageByTag() throws Exception {
         mockMvc.perform(get("/api/product/books/tagFilter")
@@ -269,12 +326,28 @@ class BookControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("도서 페이지 조회 - 태그 (관리자)")
+    @Test
+    void getBookPageByTag2() throws Exception {
+        mockMvc.perform(get("/api/product/admin/books/tagFilter")
+                        .headers(headers)
+                        .param("tagName", "test,test2"))
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("도서 페이지 조회 - 나의 좋아요")
-    @WithMockUser(roles = "CLIENT")
     @Test
     void getBookPageByMyLike() throws Exception {
         mockMvc.perform(get("/api/product/client/books/like")
                         .header("X-User-Id", 1))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("도서 페이지 조회 - 나의 좋아요 (관리자)")
+    @Test
+    void getBookPageByMyLike2() throws Exception {
+        mockMvc.perform(get("/api/product/admin/books/like")
+                        .headers(headers))
                 .andExpect(status().isOk());
     }
 }

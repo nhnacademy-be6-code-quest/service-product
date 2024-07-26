@@ -40,6 +40,11 @@ public class ProductController {
 
     private static final String ID_HEADER = "X-User-Id";
 
+    @GetMapping("/admin")
+    public ResponseEntity<Void> checkIfAdmin() {
+        return ResponseEntity.ok().headers(header).build();
+    }
+
     @GetMapping("/single/{productId}")
     public ResponseEntity<ProductGetNameAndPriceResponseDto> getSingleProductNameAndPriceSales(
             @PathVariable("productId") Long productId

@@ -147,7 +147,9 @@ class ProductCategoryControllerTest {
     @Test
     void getAllCategoryTestSuccess() throws Exception {
 
-        mockMvc.perform(get("/api/product/categories/all"))
+        mockMvc.perform(get("/api/product/admin/categories/all")
+                .header("X-User-Id", "1")
+                .header("X-User-Role", "ROLE_ADMIN"))
                 .andExpect(status().isOk());
 
         verify(productCategoryService,times(1)).getAllCategoryPage(any());
@@ -157,7 +159,9 @@ class ProductCategoryControllerTest {
     @Test
     void getNameContainingCategoryTestSuccess() throws Exception {
 
-        mockMvc.perform(get("/api/product/categories/containing")
+        mockMvc.perform(get("/api/product/admin/categories/containing")
+                        .header("X-User-Id", "1")
+                        .header("X-User-Role", "ROLE_ADMIN")
                         .param("categoryName", "test"))
                 .andExpect(status().isOk());
 
@@ -168,7 +172,9 @@ class ProductCategoryControllerTest {
     @Test
     void getSubCategoryTestSuccess() throws Exception {
 
-        mockMvc.perform(get("/api/product/categories/1/sub"))
+        mockMvc.perform(get("/api/product/admin/categories/1/sub")
+                .header("X-User-Id", "1")
+                .header("X-User-Role", "ROLE_ADMIN"))
                 .andExpect(status().isOk());
 
         verify(productCategoryService,times(1)).getSubCategoryPage(any(),eq(1L));

@@ -52,14 +52,14 @@ public class TagController {
     }
 
 
-    @GetMapping("/tags/all")
+    @GetMapping("/admin/tags/all")
     public ResponseEntity<Page<TagGetResponseDto>> getAllTags(
             @Valid @ModelAttribute PageRequestDto pageRequestDto) {
         return new ResponseEntity<>(tagService.getAllTagPage(pageRequestDto), header, HttpStatus.OK);
     }
 
 
-    @GetMapping("/tags/containing")
+    @GetMapping("/admin/tags/containing")
     public ResponseEntity<Page<TagGetResponseDto>> getNameContainingTagPage(
             @Valid @ModelAttribute PageRequestDto pageRequestDto,
             @NotBlank @RequestParam("tagName") String tagName) {

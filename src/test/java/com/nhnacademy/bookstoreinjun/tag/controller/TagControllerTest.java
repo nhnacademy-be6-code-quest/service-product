@@ -120,7 +120,9 @@ class TagControllerTest {
     @Test
     void testGetAllTagSuccess() throws Exception {
 
-        mockMvc.perform(get("/api/product/tags/all"))
+        mockMvc.perform(get("/api/product/admin/tags/all")
+                        .header("X-User-Id", "1")
+                        .header("X-User-Role", "ROLE_ADMIN"))
                 .andExpect(status().isOk());
 
         verify(tagService,times(1)).getAllTagPage(any());
@@ -130,7 +132,9 @@ class TagControllerTest {
     @Test
     void testGetNameContainingTagSuccess() throws Exception {
 
-        mockMvc.perform(get("/api/product/tags/containing")
+        mockMvc.perform(get("/api/product/admin/tags/containing")
+                        .header("X-User-Id", "1")
+                        .header("X-User-Role", "ROLE_ADMIN")
                         .param("tagName", "test"))
                 .andExpect(status().isOk());
 

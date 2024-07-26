@@ -37,7 +37,8 @@ public class SecurityConfig {
                         new HeaderFilter.RouteConfig(productClientPath, HttpMethod.DELETE.name(), Collections.emptyList()),
                         new HeaderFilter.RouteConfig(productAdminPath, HttpMethod.GET.name(), List.of(ADMIN)),
                         new HeaderFilter.RouteConfig(productAdminPath, HttpMethod.POST.name(), List.of(ADMIN)),
-                        new HeaderFilter.RouteConfig(productAdminPath, HttpMethod.PUT.name(), List.of(ADMIN))
+                        new HeaderFilter.RouteConfig(productAdminPath, HttpMethod.PUT.name(), List.of(ADMIN)),
+                        new HeaderFilter.RouteConfig(productAdminPath, HttpMethod.DELETE.name(), List.of(ADMIN))
                 )), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(req ->
                                 req.anyRequest().permitAll()

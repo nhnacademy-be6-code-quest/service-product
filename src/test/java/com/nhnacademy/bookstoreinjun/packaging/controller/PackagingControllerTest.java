@@ -46,6 +46,30 @@ class PackagingControllerTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    @DisplayName("권한 체크 테스트 1 (비회원)")
+    @Test
+    void roleCheckTest1() throws Exception {
+        mockMvc.perform(get("/api/product/admin/packaging/roleCheck"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @DisplayName("권한 체크 테스트 2 (일반회원)")
+    @Test
+    void roleCheckTest2() throws Exception {
+        mockMvc.perform(get("/api/product/admin/packaging/roleCheck")
+                        .header("X-User-Id", "1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @DisplayName("권한 체크 테스트 3 (관리자)")
+    @Test
+    void roleCheckTest3() throws Exception {
+        mockMvc.perform(get("/api/product/admin/packaging/roleCheck")
+                        .header("X-User-Role", "ROLE_ADMIN")
+                        .header("X-User-Id", 1))
+                .andExpect(status().isOk());
+    }
+
     @DisplayName("포장지 개별 조회 성공 테스트")
     @Test
     void getSinglePackagingSuccessTest() throws Exception {
@@ -120,11 +144,25 @@ class PackagingControllerTest {
     }
 
 
-    @DisplayName("포장지 조회 성공 테스트 - 페이지")
+    @DisplayName("포장지 조회 성공 테스트 - 페이지 (관리자 X)")
     @Test
     void getPackagePageSuccessTest() throws Exception {
 
         mockMvc.perform(get("/api/product/packaging/page")
+                        .param("page", "1")
+                        .param("size", "10"))
+                .andExpect(status().isOk());
+
+        verify(packagingService, times(1)).getPackagesPage(null, 1, 10);
+    }
+
+    @DisplayName("포장지 조회 성공 테스트 - 페이지 (관리자)")
+    @Test
+    void getPackagePageForAdminSuccessTest() throws Exception {
+
+        mockMvc.perform(get("/api/product/admin/packaging/page")
+                        .header("X-User-Role", "ROLE_ADMIN")
+                        .header("X-User-Id", 1)
                         .param("page", "1")
                         .param("size", "10"))
                 .andExpect(status().isOk());

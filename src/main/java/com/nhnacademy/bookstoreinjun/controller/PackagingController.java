@@ -55,4 +55,16 @@ public class PackagingController {
             @Min(1) @RequestParam(name = "page") int page, @RequestParam(name = "size") int size) {
         return new ResponseEntity<>(packagingService.getPackagesPage(productState, page, size), header, HttpStatus.OK);
     }
+
+    @GetMapping("/admin/packaging/roleCheck")
+    public ResponseEntity<Void> roleCheck(){
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/packaging/page")
+    public ResponseEntity<Page<PackagingGetResponseDto>> getPackagePageForAdmin(
+            @RequestParam(name = "productState", required = false) Integer productState,
+            @Min(1) @RequestParam(name = "page") int page, @RequestParam(name = "size") int size) {
+        return new ResponseEntity<>(packagingService.getPackagesPage(productState, page, size), header, HttpStatus.OK);
+    }
 }

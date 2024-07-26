@@ -30,7 +30,7 @@ public class CategoryController {
     private final ProductCategoryService productCategoryService;
 
     private final HttpHeaders header;
-
+    
     @PostMapping("/admin/category/register")
     public ResponseEntity<CategoryRegisterResponseDto> createCategory(@Valid @RequestBody CategoryRegisterRequestDto categoryRegisterRequestDto) {
         return new ResponseEntity<>(productCategoryService.saveCategory(categoryRegisterRequestDto), header, HttpStatus.CREATED);
@@ -46,13 +46,13 @@ public class CategoryController {
         return productCategoryService.deleteCategory(categoryId);
     }
 
-    @GetMapping("/categories/all")
+    @GetMapping("/admin/categories/all")
     public ResponseEntity<Page<CategoryGetResponseDto>> getAllCategories(
             @Valid @ModelAttribute PageRequestDto pageRequestDto) {
         return new ResponseEntity<>(productCategoryService.getAllCategoryPage(pageRequestDto), header, HttpStatus.OK);
     }
 
-    @GetMapping("/categories/containing")
+    @GetMapping("/admin/categories/containing")
     public ResponseEntity<Page<CategoryGetResponseDto>> getNameContainingCategories(
             @Valid @ModelAttribute PageRequestDto pageRequestDto,
             @NotBlank @RequestParam("categoryName") String categoryName) {
@@ -60,14 +60,12 @@ public class CategoryController {
         return new ResponseEntity<>(productCategoryService.getNameContainingCategoryPage(pageRequestDto, categoryName), header, HttpStatus.OK);
     }
 
-    @GetMapping("/categories/{categoryId}/sub")
+    @GetMapping("/admin/categories/{categoryId}/sub")
     public ResponseEntity<Page<CategoryGetResponseDto>> getSubCategories(
             @Valid @ModelAttribute PageRequestDto pageRequestDto,
             @PathVariable("categoryId") Long categoryId) {
         return new ResponseEntity<>(productCategoryService.getSubCategoryPage(pageRequestDto, categoryId), header, HttpStatus.OK);
     }
-
-
 
     @GetMapping("/categories/tree")
     public ResponseEntity<CategoryNodeResponseDto> getCategoriesTree() {
