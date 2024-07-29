@@ -1,5 +1,6 @@
 package com.nhnacademy.bookstoreinjun.config.log;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import java.util.Collections;
@@ -37,10 +38,10 @@ public class LogAndCrashAppender extends AppenderBase<ILoggingEvent> {
             logMessage += "\n" + eventObject.getThrowableProxy().getClassName() + ": "
                     + eventObject.getThrowableProxy().getMessage();
         }
-        sendLog(logMessage);
+        sendLog(logMessage, eventObject.getLevel());
     }
 
-    private void sendLog(String message) {
+    private void sendLog(String message, Level level) {
         Map<String, Object> logData = new HashMap<>();
         logData.put("projectName", appKey);
         logData.put("projectVersion", "1.0.0");
@@ -49,6 +50,7 @@ public class LogAndCrashAppender extends AppenderBase<ILoggingEvent> {
         logData.put("logSource", "http");
         logData.put("logType", "log");
         logData.put("Platform", platform);
+        logData.put("level", level.toString());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -10,6 +10,8 @@ import com.nhnacademy.bookstoreinjun.dto.cart.CartCheckoutRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.page.PageRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryDecreaseRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryIncreaseRequestDto;
+import com.nhnacademy.bookstoreinjun.entity.Product;
+import com.nhnacademy.bookstoreinjun.repository.ProductRepository;
 import com.nhnacademy.bookstoreinjun.repository.QuerydslRepositoryImpl;
 import com.nhnacademy.bookstoreinjun.util.PageableUtil;
 import java.util.Arrays;
@@ -32,6 +34,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
@@ -47,19 +50,24 @@ class QuerydslRepositoryTest{
     @Autowired
     private QuerydslRepositoryImpl querydslRepository;
 
-    @DisplayName("개별 도서 조회 테스트")
+    @Autowired
+    private ProductRepository productRepository;
+
+    @DisplayName("개별 도서 조회 테스트 - Querydsl 의 영속성 컨텍스트 비간섭 테스트")
     @Order(0)
     @Test
+    @Transactional
     void testFindBookByProductId() {
-        BookProductGetResponseDto responseDto=  querydslRepository.findBookByProductId(1L,1L);
+        Product beforeProduct = productRepository.findById(1L).orElseThrow();
+        assertEquals(10, beforeProduct.getProductViewCount());
 
-        assertNotNull(responseDto);
-        assertTrue(responseDto.hasLike());
+        BookProductGetResponseDto responseDto=  querydslRepository.findBookByProductId(1L,1L);
         assertEquals(11, responseDto.productViewCount());
-        assertEquals(2, responseDto.categorySet().size());
-        assertEquals(2, responseDto.tagSet().size());
-        log.info("response dto: {}", responseDto);
+
+        Product afterProduct = productRepository.findById(1L).orElseThrow();
+        assertEquals(10, afterProduct.getProductViewCount());
     }
+
 
     @DisplayName("도서 페이지 조회 테스트 - 판매 중 상태, 재고순 정렬")
     @Order(0)
