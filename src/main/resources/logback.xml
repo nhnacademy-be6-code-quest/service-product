@@ -11,7 +11,7 @@
         </encoder>
     </appender>
 
-    <appender name="LOGNCRASH" class="com.nhnacademy.codequest.product.config.log.LogAndCrashAppender">
+    <appender name="LOGNCRASH" class="com.nhnacademy.bookstoreinjun.config.LogAndCrashAppender">
         <appKey>Xyx7DoyszcG66ULx</appKey>
         <platform>code-quest.product</platform>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">

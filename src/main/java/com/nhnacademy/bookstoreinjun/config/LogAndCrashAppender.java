@@ -1,4 +1,4 @@
-package com.nhnacademy.bookstoreinjun.config.log;
+package com.nhnacademy.bookstoreinjun.config;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class LogAndCrashAppender extends AppenderBase<ILoggingEvent> {
+    private static final String URL = "https://api-logncrash.cloud.toast.com/v2/log";
     private RestTemplate restTemplate;
     @Setter
     private String appKey;
@@ -50,20 +51,14 @@ public class LogAndCrashAppender extends AppenderBase<ILoggingEvent> {
         logData.put("logSource", "http");
         logData.put("logType", "log");
         logData.put("Platform", platform);
-        logData.put("level", level.toString());
+        logData.put("logLevel", level.toString());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(logData, headers);
-
         try {
-            String response = restTemplate.postForObject(
-                    "https://api-logncrash.cloud.toast.com/v2/log",
-                    request,
-                    String.class
-            );
+            String response = restTemplate.postForObject(URL, request, String.class);
             log.info("Log sent successfully. Response: {}", response);
         } catch (Exception e) {
             log.error("Failed to send log: {}", e.getMessage());

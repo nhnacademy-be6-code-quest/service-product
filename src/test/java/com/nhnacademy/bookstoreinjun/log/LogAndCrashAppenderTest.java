@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.ThrowableProxy;
-import com.nhnacademy.bookstoreinjun.config.log.LogAndCrashAppender;
+import com.nhnacademy.bookstoreinjun.config.LogAndCrashAppender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
