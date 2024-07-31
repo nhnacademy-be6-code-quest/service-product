@@ -54,4 +54,4 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script_stop: true
-        script: "./product_startup.sh"
+        script: "./CD/main.sh 8004 1004 Product-0.0.1-SNAPSHOT.jar product_log"
