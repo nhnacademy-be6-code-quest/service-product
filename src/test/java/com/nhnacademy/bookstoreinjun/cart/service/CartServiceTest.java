@@ -260,13 +260,10 @@ class CartServiceTest {
     @DisplayName("장바구니 조회 성공 테스트 - 회원")
     @Test
     void getClientCartSuccessTest(){
-        Product product1 = Product.builder().productId(1L).productInventory(7L).build();
-        Product product2 = Product.builder().productId(2L).productInventory(15L).build();
-        when(cartRepository.findAllByClientIdAndCartRemoveTypeIsNull(1L))
+        when(querydslRepository.getClientCart(1L))
                 .thenReturn(Arrays.asList(
-                        Cart.builder().product(product1).quantity(2L).build(),
-                        Cart.builder().product(product1).quantity(2L).build(),
-                        Cart.builder().product(product2).quantity(10L).build()
+                        CartGetResponseDto.builder().build(),
+                        CartGetResponseDto.builder().build()
                 ));
 
         List<CartGetResponseDto> cartGetResponseDtoList = cartService.getClientCart(1L);
@@ -280,12 +277,9 @@ class CartServiceTest {
         assertThrows(XUserIdNotFoundException.class,() -> cartService.getClientCart(-1L));
     }
 
-    @DisplayName("장바구니 조회 성공 테스트 - 회원")
+    @DisplayName("장바구니 조회 성공 테스트 - 비회원")
     @Test
     void getGuestCartSuccessTest(){
-        when(productRepository.findById(1L)).thenReturn(Optional.of(new Product()));
-        when(productRepository.findById(3L)).thenReturn(Optional.of(new Product()));
-
         List<CartRequestDto> cartRequestDtoList = Arrays.asList(
                 CartRequestDto.builder()
                         .productId(1L)
@@ -296,6 +290,12 @@ class CartServiceTest {
                         .quantity(4L)
                         .build()
         );
+
+        when(querydslRepository.getGuestCart(cartRequestDtoList))
+                .thenReturn(Arrays.asList(
+                        CartGetResponseDto.builder().build(),
+                        CartGetResponseDto.builder().build()
+                ));
 
         List<CartGetResponseDto> cartGetResponseDtoList = cartService.getGuestCart(cartRequestDtoList);
 

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/product")
-public class CartController {
+public class CartController implements CartControllerInterface{
     private final CartService cartService;
 
     private final HttpHeaders header;
@@ -60,7 +60,7 @@ public class CartController {
 
 
     @PostMapping("/guest/cart/add")
-    ResponseEntity<SaveCartResponseDto> addGuestCartItem(
+    public ResponseEntity<SaveCartResponseDto> addGuestCartItem(
             @RequestBody @Valid CartRequestDto cartRequestDto){
         return new ResponseEntity<>(cartService.checkCartRequestOfGuest(cartRequestDto), header, HttpStatus.OK);
     }
@@ -74,7 +74,7 @@ public class CartController {
     }
 
     @PutMapping("/guest/cart/update")
-    ResponseEntity<SaveCartResponseDto> updateGuestCartItem(
+    public ResponseEntity<SaveCartResponseDto> updateGuestCartItem(
             @RequestBody @Valid CartRequestDto cartRequestDto){
         return new ResponseEntity<>(cartService.checkCartRequestOfGuest(cartRequestDto), header, HttpStatus.OK);
     }

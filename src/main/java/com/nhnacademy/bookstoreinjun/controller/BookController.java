@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
-public class BookController {
+public class BookController implements BookControllerInterface{
 
     private final AladinService aladinService;
 
@@ -54,6 +54,25 @@ public class BookController {
         return new ResponseEntity<>(new ErrorResponseDto(ex.getMessage()), header, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @GetMapping("/admin/book/roleCheck")
+    public ResponseEntity<Void> roleCheck(){
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @GetMapping("/admin/book")
+    public ResponseEntity<Page<AladinBookResponseDto>> getBooksForAdmin(
+            @Valid @ModelAttribute PageRequestDto pageRequestDto,
+            @RequestParam("title") String title) {
+        return new ResponseEntity<>(aladinService.getAladdinBookPage(pageRequestDto, title), header, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/admin/book/isbnCheck")
+    public ResponseEntity<Void> checkIfBookExistsForAdmin(@RequestParam("isbn") String isbn){
+        boolean duplicate = bookService.checkIfBookExists(isbn);
+        return new ResponseEntity<>(null, header, duplicate ? HttpStatus.CONFLICT : HttpStatus.OK);
+    }
 
     @PostMapping("/admin/book/register")
     public ResponseEntity<ProductRegisterResponseDto> saveBookProduct(
@@ -65,8 +84,15 @@ public class BookController {
     @PutMapping("/admin/book/update")
     public ResponseEntity<ProductUpdateResponseDto> updateBook(
             @Valid @RequestBody BookProductUpdateRequestDto bookProductUpdateRequestDto){
-        log.info("dto : {}", bookProductUpdateRequestDto);
         return new ResponseEntity<>(bookService.updateBook(bookProductUpdateRequestDto), header, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/book/{productId}")
+    public ResponseEntity<BookProductGetResponseDto> getSingleBookInfo(
+            @RequestHeader HttpHeaders httpHeaders,
+            @Min(1) @PathVariable long productId){
+        return new ResponseEntity<>(bookService.getBookByProductId(NumberUtils.toLong(httpHeaders.getFirst(ID_HEADER), -1L), productId), header, HttpStatus.OK);
     }
 
 
@@ -90,12 +116,6 @@ public class BookController {
     }
 
 
-    @GetMapping("/book/{productId}")
-    public ResponseEntity<BookProductGetResponseDto> getSingleBookInfo(
-            @RequestHeader HttpHeaders httpHeaders,
-            @Min(1) @PathVariable long productId){
-        return new ResponseEntity<>(bookService.getBookByProductId(NumberUtils.toLong(httpHeaders.getFirst(ID_HEADER), -1L), productId), header, HttpStatus.OK);
-    }
 
 
     @GetMapping("/books/category/{categoryId}")
@@ -118,23 +138,23 @@ public class BookController {
         return new ResponseEntity<>(bookService.getBookPageFilterByTagsAndProductState(NumberUtils.toLong(httpHeaders.getFirst(ID_HEADER), -1L), pageRequestDto, tagNameSet, conditionIsAnd, productState), header, HttpStatus.OK);
     }
 
-    @GetMapping("/admin/book/roleCheck")
-    public ResponseEntity<Void> roleCheck(){
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @GetMapping("/admin/book")
-    public ResponseEntity<Page<AladinBookResponseDto>> getBooksForAdmin(
+    @GetMapping("/client/books/like")
+    public ResponseEntity<Page<BookProductGetResponseDto>> getLikeBookPage(
+            @RequestHeader HttpHeaders httpHeaders,
             @Valid @ModelAttribute PageRequestDto pageRequestDto,
-            @RequestParam("title") String title) {
-        return new ResponseEntity<>(aladinService.getAladdinBookPage(pageRequestDto, title), header, HttpStatus.OK);
+            @RequestParam(name = "productState", required = false) Integer productState
+    ){
+        return new ResponseEntity<>(bookService.getLikeBookPage(NumberUtils.toLong(httpHeaders.getFirst(ID_HEADER), -1L), pageRequestDto, productState), header, HttpStatus.OK);
     }
 
-    @GetMapping("/admin/book/isbnCheck")
-    public ResponseEntity<Void> checkIfBookExistsForAdmin(@RequestParam("isbn") String isbn){
-        boolean duplicate = bookService.checkIfBookExists(isbn);
-        return new ResponseEntity<>(null, header, duplicate ? HttpStatus.CONFLICT : HttpStatus.OK);
+
+    @GetMapping("/admin/book/{productId}")
+    public ResponseEntity<BookProductGetResponseDto> getSingleBookInfoForAdmin(
+            @RequestHeader HttpHeaders httpHeaders,
+            @Min(1) @PathVariable long productId){
+        return new ResponseEntity<>(bookService.getBookByProductId(NumberUtils.toLong(httpHeaders.getFirst(ID_HEADER), -1L), productId), header, HttpStatus.OK);
     }
+
 
     @GetMapping("/admin/books")
     public ResponseEntity<Page<BookProductGetResponseDto>> getAllBookPageForAdmin(
@@ -153,14 +173,6 @@ public class BookController {
             @RequestParam(name = "productState", required = false) Integer productState,
             @RequestParam("title") String title){
         return new ResponseEntity<>(bookService.getNameContainingBookPageByProductState(NumberUtils.toLong(httpHeaders.getFirst(ID_HEADER), -1L), pageRequestDto, title, productState), header, HttpStatus.OK);
-    }
-
-
-    @GetMapping("/admin/book/{productId}")
-    public ResponseEntity<BookProductGetResponseDto> getSingleBookInfoForAdmin(
-            @RequestHeader HttpHeaders httpHeaders,
-            @Min(1) @PathVariable long productId){
-        return new ResponseEntity<>(bookService.getBookByProductId(NumberUtils.toLong(httpHeaders.getFirst(ID_HEADER), -1L), productId), header, HttpStatus.OK);
     }
 
 
@@ -192,15 +204,4 @@ public class BookController {
     ){
         return new ResponseEntity<>(bookService.getLikeBookPage(NumberUtils.toLong(httpHeaders.getFirst(ID_HEADER), -1L), pageRequestDto, productState), header, HttpStatus.OK);
     }
-
-
-    @GetMapping("/client/books/like")
-    public ResponseEntity<Page<BookProductGetResponseDto>> getLikeBookPage(
-            @RequestHeader HttpHeaders httpHeaders,
-            @Valid @ModelAttribute PageRequestDto pageRequestDto,
-            @RequestParam(name = "productState", required = false) Integer productState
-            ){
-        return new ResponseEntity<>(bookService.getLikeBookPage(NumberUtils.toLong(httpHeaders.getFirst(ID_HEADER), -1L), pageRequestDto, productState), header, HttpStatus.OK);
-    }
-
 }

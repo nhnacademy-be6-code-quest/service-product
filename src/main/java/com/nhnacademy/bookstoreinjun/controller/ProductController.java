@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/product")
-public class ProductController {
+public class ProductController implements ProductControllerInterface{
 
     private final ProductService productService;
 

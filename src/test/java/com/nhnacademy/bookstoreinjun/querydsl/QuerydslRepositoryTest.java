@@ -3,14 +3,18 @@ package com.nhnacademy.bookstoreinjun.querydsl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.nhnacademy.bookstoreinjun.dto.book.BookProductGetResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.cart.CartCheckoutRequestDto;
+import com.nhnacademy.bookstoreinjun.dto.cart.CartGetResponseDto;
+import com.nhnacademy.bookstoreinjun.dto.cart.CartRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.page.PageRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryDecreaseRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryIncreaseRequestDto;
 import com.nhnacademy.bookstoreinjun.entity.Product;
+import com.nhnacademy.bookstoreinjun.exception.NotFoundIdException;
 import com.nhnacademy.bookstoreinjun.repository.ProductRepository;
 import com.nhnacademy.bookstoreinjun.repository.QuerydslRepositoryImpl;
 import com.nhnacademy.bookstoreinjun.util.PageableUtil;
@@ -316,9 +320,62 @@ class QuerydslRepositoryTest{
         assertEquals(200L, increasedResponseDto2.productInventory());
     }
 
+    @Order(0)
+    @DisplayName("장바구니 조회 테스트 - 회원")
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/querydsl-cart-data-clear.sql")
+    @Test
+    void getClientCartTest(){
+        List<CartGetResponseDto> responseDtoList = querydslRepository.getClientCart(1L);
 
+        assertEquals(2, responseDtoList.size());
+    }
+
+    @DisplayName("장바구니 조회 테스트 - 비회원 - 성공")
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/querydsl-cart-data-clear.sql")
+    @Test
+    void getGuestCartTest1(){
+
+        List<CartRequestDto> requestDtoList = Arrays.asList(
+                CartRequestDto.builder()
+                        .productId(1L)
+                        .quantity(5L)
+                        .build(),
+                CartRequestDto.builder()
+                        .productId(2L)
+                        .quantity(5L)
+                        .build()
+        );
+
+        List<CartGetResponseDto> responseDtoList = querydslRepository.getGuestCart(requestDtoList);
+
+        assertEquals(2, responseDtoList.size());
+    }
+
+    @DisplayName("장바구니 조회 테스트 - 비회원 - 실패 (상품 데이터가 찾아지지 않음)")
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/querydsl-cart-data-clear.sql")
+    @Test
+    void getGuestCartTest2(){
+        List<CartRequestDto> requestDtoList = Arrays.asList(
+                CartRequestDto.builder()
+                        .productId(100L)
+                        .quantity(5L)
+                        .build(),
+                CartRequestDto.builder()
+                        .productId(2L)
+                        .quantity(5L)
+                        .build()
+        );
+
+        assertThrows(NotFoundIdException.class, () -> querydslRepository.getGuestCart(requestDtoList));
+    }
+
+    @Order(1)
     @DisplayName("장바구니 처리 테스트 - 구매로 인한 비우기")
-    @Sql("/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/querydsl-cart-data-clear.sql")
     @Test
     void checkoutCartTest(){
         CartCheckoutRequestDto requestDto = CartCheckoutRequestDto.builder()
@@ -332,13 +389,16 @@ class QuerydslRepositoryTest{
     }
 
 
+    @Order(1)
     @DisplayName("장바구니 처리 테스트 - 개별 상품 직접 삭제 - 장바구니에 담긴 상품")
-    @Sql("/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/querydsl-cart-data-clear.sql")
     @Test
     void deleteCartItemTest1(){
         assertTrue(querydslRepository.deleteCartItem(1L, 1L));
     }
 
+    @Order(1)
     @DisplayName("장바구니 처리 테스트 - 개별 상품 직접 삭제 - 장바구니에 담겨있지 않은 상품")
     @Sql("/querydsl-cart-data.sql")
     @Test
@@ -347,15 +407,20 @@ class QuerydslRepositoryTest{
     }
 
 
+    @Order(1)
     @DisplayName("장바구니 처리 테스트 - 장바구니 상품 모두 직접 비우기 - 장바구니에 상품이 담겨있는 유저")
-    @Sql("/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/querydsl-cart-data-clear.sql")
     @Test
     void deleteAllCartTest(){
         assertTrue(querydslRepository.deleteAllCart(1L));
     }
 
+
+    @Order(1)
     @DisplayName("장바구니 처리 테스트 - 장바구니 상품 모두 직접 비우기 - 장바구니에 상품이 담겨있지 않은 유저")
-    @Sql("/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "/querydsl-cart-data.sql")
+    @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "/querydsl-cart-data-clear.sql")
     @Test
     void deleteAllCartTest2(){
         assertFalse(querydslRepository.deleteAllCart(2L));

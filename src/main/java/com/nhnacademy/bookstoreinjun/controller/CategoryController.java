@@ -26,23 +26,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryController implements CategoryControllerInterface{
     private final ProductCategoryService productCategoryService;
 
     private final HttpHeaders header;
-    
+
     @PostMapping("/admin/category/register")
-    public ResponseEntity<CategoryRegisterResponseDto> createCategory(@Valid @RequestBody CategoryRegisterRequestDto categoryRegisterRequestDto) {
+    public ResponseEntity<CategoryRegisterResponseDto> createCategory(
+            @Valid @RequestBody CategoryRegisterRequestDto categoryRegisterRequestDto) {
         return new ResponseEntity<>(productCategoryService.saveCategory(categoryRegisterRequestDto), header, HttpStatus.CREATED);
     }
 
     @PutMapping("/admin/category/update")
-    public ResponseEntity<CategoryUpdateResponseDto> updateCategory(@Valid @RequestBody CategoryUpdateRequestDto categoryUpdateRequestDto) {
+    public ResponseEntity<CategoryUpdateResponseDto> updateCategory(
+            @Valid @RequestBody CategoryUpdateRequestDto categoryUpdateRequestDto) {
         return new ResponseEntity<>(productCategoryService.updateCategory(categoryUpdateRequestDto), header, HttpStatus.OK);
     }
 
     @DeleteMapping("/admin/category/delete/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Long categoryId) {
+    public ResponseEntity<Void> deleteCategory(
+            @PathVariable("categoryId") Long categoryId) {
         return productCategoryService.deleteCategory(categoryId);
     }
 

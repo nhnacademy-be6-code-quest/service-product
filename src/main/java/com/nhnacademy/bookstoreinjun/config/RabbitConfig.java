@@ -1,19 +1,32 @@
 package com.nhnacademy.bookstoreinjun.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@RequiredArgsConstructor
+@Profile("!dev")
 public class RabbitConfig {
     private static final String EXCHANGE = "x-dead-letter-exchange";
 
     private static final String ROUTING_KEY = "x-dead-letter-routing-key";
+
+    private final String rabbitHost;
+    private final int rabbitPort;
+    private final String rabbitUsername;
+    private final String rabbitPassword;
 
     @Value("${rabbit.inventory.increase.exchange.name}")
     private String increaseInventoryExchangeName;
@@ -49,6 +62,22 @@ public class RabbitConfig {
     private String cartCheckoutDlqQueueName;
     @Value("${rabbit.cart.checkout.dlq.routing.key}")
     private String cartCheckoutDlqRoutingKey;
+
+
+    @Bean
+    public ConnectionFactory connectionFactory() {
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitHost, rabbitPort);
+        connectionFactory.setUsername(rabbitUsername);
+        connectionFactory.setPassword(rabbitPassword);
+        return connectionFactory;
+    }
+
+    @Bean
+    RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
+        return rabbitTemplate;
+    }
 
     @Bean
     DirectExchange increaseInventoryExchange() {

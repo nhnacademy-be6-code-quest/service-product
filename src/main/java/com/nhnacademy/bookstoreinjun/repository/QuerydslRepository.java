@@ -2,12 +2,11 @@ package com.nhnacademy.bookstoreinjun.repository;
 
 import com.nhnacademy.bookstoreinjun.dto.book.BookProductGetResponseDto;
 import com.nhnacademy.bookstoreinjun.dto.cart.CartCheckoutRequestDto;
+import com.nhnacademy.bookstoreinjun.dto.cart.CartGetResponseDto;
+import com.nhnacademy.bookstoreinjun.dto.cart.CartRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryDecreaseRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventoryIncreaseRequestDto;
 import com.nhnacademy.bookstoreinjun.dto.product.InventorySetRequestDto;
-import com.nhnacademy.bookstoreinjun.entity.Product;
-import com.nhnacademy.bookstoreinjun.entity.ProductCategory;
-import com.nhnacademy.bookstoreinjun.entity.Tag;
 import java.util.List;
 import java.util.Set;
 import org.springframework.data.domain.Page;
@@ -38,23 +37,6 @@ public interface QuerydslRepository {
      */
     Page<BookProductGetResponseDto> findBooksByCategoryFilter(Long clientId, Long categoryId, Pageable pageable , Integer productState);
 
-
-    /**
-     * 특정 상품에 달린 모든 태그명을 반환합니다.
-     *
-     * @param realProduct 검색할 상품
-     * @return 해당 상품에 달린 모든 태그명
-     */
-    Set<Tag> getTagSet(Product realProduct);
-
-
-    /**
-     * 특정 상품에 달린 모든 카테고리명을 반환합니다.
-     * @param realProduct 검색할 상품
-     * @return 해당 상품에 달린 모든 카테고리명
-     */
-    Set<ProductCategory> getCategorySet(Product realProduct);
-
     Page<BookProductGetResponseDto> findLikeBooks(Long clientId, Pageable pageable, Integer productState);
 
     long setProductState(Long productId, Integer productState);
@@ -70,4 +52,9 @@ public interface QuerydslRepository {
     boolean deleteAllCart(long clientId);
 
     long checkOutCart(CartCheckoutRequestDto dto);
+
+    List<CartGetResponseDto> getClientCart(Long clientId);
+
+    List<CartGetResponseDto> getGuestCart(List<CartRequestDto> cartRequestDtoList);
+
 }

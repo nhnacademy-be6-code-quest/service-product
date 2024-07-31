@@ -23,9 +23,10 @@ import org.springframework.stereotype.Service;
 public class AladinServiceImpl implements AladinService {
     private final AladinClient aladinClient;
 
+    private final XmlMapper xmlMapper = new XmlMapper();
+
     public Page<AladinBookResponseDto> getAladdinBookPage(PageRequestDto pageRequestDto, String title){
         try {
-            log.info("getAladdinBookPage start");
             byte[] bytes = title.getBytes(StandardCharsets.UTF_8);
             String utf8EncodedString = new String(bytes, StandardCharsets.UTF_8);
             String responseBody = aladinClient.getBooks("ttbjasmine066220924001"
@@ -34,14 +35,13 @@ public class AladinServiceImpl implements AladinService {
                     "Big",
                     100);
 
-            XmlMapper xmlMapper = new XmlMapper();
+
             AladinBookListResponseDto responseDto = xmlMapper.readValue(responseBody, AladinBookListResponseDto.class);
             List<AladinBookResponseDto> aladinBookResponseDtoList = responseDto.getBooks();
 
             Pageable pageable = PageableUtil.makePageable(pageRequestDto, 4, "pubDate");
-            log.info("page size : {}", pageable.getPageSize());
 
-            log.info("getAladdinBookPage done");
+
             int start = (int) pageable.getOffset();
 
             if (aladinBookResponseDtoList != null) {

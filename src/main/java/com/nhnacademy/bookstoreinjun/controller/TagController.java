@@ -31,23 +31,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
-public class TagController {
+public class TagController implements TagControllerInterface{
     private final TagService tagService;
 
     private final HttpHeaders header;
 
     @PostMapping("/admin/tag/register")
-    public ResponseEntity<TagRegisterResponseDto> createTag(@RequestBody TagRegisterRequestDto tagRegisterRequestDto) {
+    public ResponseEntity<TagRegisterResponseDto> createTag(
+            @Valid @RequestBody TagRegisterRequestDto tagRegisterRequestDto) {
         return new ResponseEntity<>(tagService.saveTag(tagRegisterRequestDto), header, HttpStatus.CREATED);
     }
 
     @PutMapping("/admin/tag/update")
-    public ResponseEntity<TagUpdateResponseDto> updateTag(@RequestBody TagUpdateRequestDto tagUpdateRequestDto) {
+    public ResponseEntity<TagUpdateResponseDto> updateTag(
+            @Valid @RequestBody TagUpdateRequestDto tagUpdateRequestDto) {
         return new ResponseEntity<>(tagService.updateTag(tagUpdateRequestDto), header, HttpStatus.OK);
     }
 
     @DeleteMapping("/admin/tag/delete/{tagId}")
-    public ResponseEntity<Void> deleteTag(@PathVariable("tagId") Long tagId) {
+    public ResponseEntity<Void> deleteTag(
+            @PathVariable("tagId") Long tagId) {
         return tagService.deleteTag(tagId);
     }
 

@@ -49,6 +49,7 @@ class ProductCategoryControllerTest {
     void saveCategoryTest1() throws Exception {
         CategoryRegisterRequestDto dto = CategoryRegisterRequestDto.builder()
                         .categoryName("test productCategory 1")
+                        .parentCategoryName("parent category 1")
                         .build();
         String json = objectMapper.writeValueAsString(dto);
 
@@ -69,6 +70,7 @@ class ProductCategoryControllerTest {
 
         CategoryRegisterRequestDto dto = CategoryRegisterRequestDto.builder()
                 .categoryName("duplicate productCategory")
+                .parentCategoryName("parent category 1")
                 .build();
         String json = objectMapper.writeValueAsString(dto);
 

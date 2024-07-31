@@ -74,7 +74,9 @@ class PackagingControllerTest {
     @Test
     void getSinglePackagingSuccessTest() throws Exception {
         when(packagingService.getPackageInfoByProductId(1L)).thenReturn(new PackagingGetResponseDto());
-        mockMvc.perform(get("/api/product/packaging/single/byProduct/1"))
+        mockMvc.perform(get("/api/product/admin/packaging/single/byProduct/1")
+                        .header("X-User-Role", "ROLE_ADMIN")
+                        .header("X-User-Id", 1))
                 .andExpect(status().isOk());
 
         verify(packagingService, times(1)).getPackageInfoByProductId(1L);
