@@ -405,7 +405,7 @@ public class QuerydslRepositoryImpl extends QuerydslRepositorySupport implements
 
             List<Tuple> entryValueTuples = entry.getValue();
             Long cartQuantity = entryValueTuples.stream()
-                    .map(tuples -> tuples.get(cart.quantity)) // cart.quantity는 Tuple에서 quantity를 가져오는 키입니다.
+                    .map(tuples -> tuples.get(cart).getQuantity()) // cart.quantity는 Tuple에서 quantity를 가져오는 키입니다.
                     .filter(Objects::nonNull) // null 체크
                     .mapToLong(Long::longValue) // Long으로 변환
                     .sum();
